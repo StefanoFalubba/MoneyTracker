@@ -88,17 +88,24 @@ export function CategoriesClient({ initialCategories, userId }: Props) {
 
   async function onSubmit(data: FormData) {
     const supabase = createClient()
-    const payload = {
-      user_id: userId,
-      type: formType,
-      name: data.name,
-      icon: data.icon || null,
-      color: data.color || null,
-    }
 
     const { error } = editingCat
-      ? await supabase.from('categories').update(payload).eq('id', editingCat.id)
-      : await supabase.from('categories').insert(payload)
+      ? await supabase
+          .from('categories')
+          .update({
+            type: formType,
+            name: data.name,
+            icon: data.icon || null,
+            color: data.color || null,
+          })
+          .eq('id', editingCat.id)
+      : await supabase.from('categories').insert({
+          user_id: userId,
+          type: formType,
+          name: data.name,
+          icon: data.icon || null,
+          color: data.color || null,
+        })
 
     if (error) {
       toast.error('Errore durante il salvataggio')

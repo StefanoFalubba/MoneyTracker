@@ -104,18 +104,25 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
     setLoading(true)
     const supabase = createClient()
 
-    const payload = {
-      user_id: userId,
-      type,
-      amount: data.amount,
-      description: data.description || null,
-      category_id: data.category_id || null,
-      date: data.date,
-    }
-
     const { error } = transaction
-      ? await supabase.from('transactions').update(payload).eq('id', transaction.id)
-      : await supabase.from('transactions').insert(payload)
+      ? await supabase
+          .from('transactions')
+          .update({
+            type,
+            amount: data.amount,
+            description: data.description || null,
+            category_id: data.category_id || null,
+            date: data.date,
+          })
+          .eq('id', transaction.id)
+      : await supabase.from('transactions').insert({
+          user_id: userId,
+          type,
+          amount: data.amount,
+          description: data.description || null,
+          category_id: data.category_id || null,
+          date: data.date,
+        })
 
     setLoading(false)
 
