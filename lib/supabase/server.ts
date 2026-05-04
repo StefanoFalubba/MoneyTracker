@@ -8,6 +8,7 @@ type CookieToSet = {
 }
 
 export async function createClient() {
+  // cookies() is sync in Next 14, async in Next 15 — awaiting works for both
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -24,7 +25,7 @@ export async function createClient() {
               cookieStore.set(name, value, options as any)
             )
           } catch {
-            // Server component — ignore
+            // Server component — write attempts will throw, that's expected
           }
         },
       },
