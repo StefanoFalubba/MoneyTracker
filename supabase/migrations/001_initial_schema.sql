@@ -1,4 +1,5 @@
--- Enable UUID extension
+-- Idempotent: safe to run multiple times.
+
 create extension if not exists "pgcrypto";
 
 -- ============================================================
@@ -15,6 +16,11 @@ create table if not exists public.categories (
 );
 
 alter table public.categories enable row level security;
+
+drop policy if exists "Users can view own categories"   on public.categories;
+drop policy if exists "Users can insert own categories" on public.categories;
+drop policy if exists "Users can update own categories" on public.categories;
+drop policy if exists "Users can delete own categories" on public.categories;
 
 create policy "Users can view own categories"
   on public.categories for select
@@ -48,6 +54,11 @@ create table if not exists public.transactions (
 
 alter table public.transactions enable row level security;
 
+drop policy if exists "Users can view own transactions"   on public.transactions;
+drop policy if exists "Users can insert own transactions" on public.transactions;
+drop policy if exists "Users can update own transactions" on public.transactions;
+drop policy if exists "Users can delete own transactions" on public.transactions;
+
 create policy "Users can view own transactions"
   on public.transactions for select
   using (auth.uid() = user_id);
@@ -73,14 +84,14 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  -- Income categories
+  -- Income
   insert into public.categories (user_id, name, type, color, icon) values
     (new.id, 'Stipendio',     'income', '#22c55e', '💼'),
     (new.id, 'Freelance',     'income', '#16a34a', '💻'),
     (new.id, 'Rimborso',      'income', '#4ade80', '💳'),
     (new.id, 'Altro entrata', 'income', '#86efac', '💰');
 
-  -- Expense categories
+  -- Expense
   insert into public.categories (user_id, name, type, color, icon) values
     (new.id, 'Casa',          'expense', '#ef4444', '🏠'),
     (new.id, 'Cibo',          'expense', '#f97316', '🍕'),
@@ -92,7 +103,7 @@ begin
     (new.id, 'Abbonamenti',   'expense', '#3b82f6', '📱'),
     (new.id, 'Altro uscita',  'expense', '#dc2626', '💸');
 
-  -- Investment categories
+  -- Investment
   insert into public.categories (user_id, name, type, color, icon) values
     (new.id, 'ETF/Fondi',           'investment', '#7F77DD', '📊'),
     (new.id, 'Azioni',              'investment', '#6366f1', '📈'),
@@ -106,6 +117,7 @@ end;
 $$;
 
 -- Trigger on new user signup
-create or replace trigger on_auth_user_created
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
