@@ -22,19 +22,57 @@ export interface Transaction {
   category?: Category | null
 }
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       categories: {
         Row: Category
-        Insert: Omit<Category, 'id' | 'created_at'>
-        Update: Partial<Omit<Category, 'id' | 'user_id' | 'created_at'>>
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          type: TransactionType
+          color?: string | null
+          icon?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          type?: TransactionType
+          color?: string | null
+          icon?: string | null
+          created_at?: string
+        }
       }
       transactions: {
-        Row: Transaction
-        Insert: Omit<Transaction, 'id' | 'created_at' | 'category'>
-        Update: Partial<Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'category'>>
+        Row: Omit<Transaction, 'category'>
+        Insert: {
+          id?: string
+          user_id: string
+          category_id?: string | null
+          amount: number
+          type: TransactionType
+          description?: string | null
+          date?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          category_id?: string | null
+          amount?: number
+          type?: TransactionType
+          description?: string | null
+          date?: string
+          created_at?: string
+        }
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
