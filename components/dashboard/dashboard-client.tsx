@@ -1,9 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import { format, parseISO, startOfMonth } from 'date-fns'
+import { format, subMonths } from 'date-fns'
 import { it } from 'date-fns/locale'
-import { subMonths } from 'date-fns'
 import {
   BarChart,
   Bar,
@@ -21,7 +20,6 @@ import type { Transaction, Category } from '@/types/database'
 import { formatCurrency, formatDate, TYPE_CONFIG } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Info } from 'lucide-react'
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 
