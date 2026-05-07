@@ -1,0 +1,76 @@
+{
+  "name": "FinanceTrack - Gestore Finanze Personali",
+  "short_name": "FinanceTrack",
+  "description": "Gestisci le tue finanze personali e di business con semplicità. Traccia entrate, spese, investimenti e abbonamenti ricorrenti.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1a1a1a",
+  "background_color": "#ffffff",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/screenshot-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Aggiungi spesa",
+      "short_name": "Aggiungi spesa",
+      "description": "Aggiungi velocemente una nuova spesa",
+      "url": "/?add=expense",
+      "icons": [{ "src": "/icons/shortcut-expense.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Aggiungi entrata",
+      "short_name": "Aggiungi entrata",
+      "description": "Aggiungi velocemente una nuova entrata",
+      "url": "/?add=income",
+      "icons": [{ "src": "/icons/shortcut-income.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Transazioni",
+      "short_name": "Transazioni",
+      "description": "Visualizza tutte le transazioni",
+      "url": "/transactions",
+      "icons": [{ "src": "/icons/shortcut-transactions.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
