@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   // Last 6 months range
   const sixMonthsAgo = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd')
 
-  const [{ data: transactions }, { data: recentTransactions }, { data: categories }] =
+  const [{ data: transactions }, { data: recentTransactions }, { data: categories }, { data: recurring }] =
     await Promise.all([
       supabase
         .from('transactions')
@@ -33,6 +33,12 @@ export default async function DashboardPage() {
         .order('date', { ascending: false })
         .limit(10),
       supabase.from('categories').select('*').eq('user_id', user.id),
+      supabase
+        .from('recurring_transactions')
+        .select('*, category:categories(*)')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .order('name'),
     ])
 
   return (
@@ -40,6 +46,7 @@ export default async function DashboardPage() {
       transactions={transactions ?? []}
       recentTransactions={recentTransactions ?? []}
       categories={categories ?? []}
+      recurring={recurring ?? []}
       monthStart={monthStart}
       monthEnd={monthEnd}
       sixMonthsAgo={sixMonthsAgo}

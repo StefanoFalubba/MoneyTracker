@@ -1,4 +1,5 @@
 export type TransactionType = 'income' | 'expense' | 'investment'
+export type RecurringFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly'
 
 export interface Category {
   id: string
@@ -29,7 +30,29 @@ export interface Transaction {
   type: TransactionType
   description: string | null
   date: string
+  is_business?: boolean
   created_at: string
+  category?: Category | null
+  subcategory?: Subcategory | null
+}
+
+export interface RecurringTransaction {
+  id: string
+  user_id: string
+  category_id: string
+  subcategory_id: string | null
+  name: string
+  amount: number
+  type: TransactionType
+  frequency: RecurringFrequency
+  start_date: string
+  end_date: string | null
+  last_executed_date: string | null
+  is_business: boolean
+  description: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
   category?: Category | null
   subcategory?: Subcategory | null
 }

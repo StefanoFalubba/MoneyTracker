@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { format, subMonths } from 'date-fns'
+import { format, subMonths, addDays, addWeeks, addMonths, addQuarters, addYears } from 'date-fns'
 import { it } from 'date-fns/locale'
 import {
   BarChart,
@@ -16,7 +16,7 @@ import {
   Pie,
   Cell,
 } from 'recharts'
-import type { Transaction, Category } from '@/types/database'
+import type { Transaction, Category, RecurringTransaction } from '@/types/database'
 import { formatCurrency, formatDate, TYPE_CONFIG } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -29,6 +29,7 @@ interface Props {
   transactions: Transaction[]
   recentTransactions: (Transaction & { category: Category | null })[]
   categories: Category[]
+  recurring: (RecurringTransaction & { category?: Category | null })[]
   monthStart: string
   monthEnd: string
   sixMonthsAgo: string
@@ -40,6 +41,7 @@ export function DashboardClient({
   transactions,
   recentTransactions,
   categories,
+  recurring,
   monthStart,
   monthEnd,
   currentMonthLabel,
@@ -214,6 +216,75 @@ export function DashboardClient({
         <p className="text-xs text-muted-foreground -mt-4">
           Il saldo netto non include gli investimenti.
         </p>
+
+        {/* Prossime ricorrenze */}
+        {recurring.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Prossime ricorrenze</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {recurring.slice(0, 5).map((r) => {
+                  const lastDate = r.last_executed_date ? new Date(r.last_executed_date) : new Date(r.start_date)
+                  let nextDate = lastDate
+
+                  switch (r.frequency) {
+                    case 'daily':
+                      nextDate = addDays(lastDate, 1)
+                      break
+                    case 'weekly':
+                      nextDate = addWeeks(lastDate, 1)
+                      break
+                    case 'biweekly':
+                      nextDate = addWeeks(lastDate, 2)
+                      break
+                    case 'monthly':
+                      nextDate = addMonths(lastDate, 1)
+                      break
+                    case 'quarterly':
+                      nextDate = addQuarters(lastDate, 1)
+                      break
+                    case 'yearly':
+                      nextDate = addYears(lastDate, 1)
+                      break
+                  }
+
+                  return (
+                    <div key={r.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-lg">{r.category?.icon ?? '💰'}</span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{r.name}</p>
+                          <p className="text-xs text-muted-foreground">{format(nextDate, 'd MMM', { locale: it })}</p>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-sm font-semibold whitespace-nowrap ml-2 ${
+                          r.type === 'income'
+                            ? 'text-income-dark'
+                            : r.type === 'expense'
+                            ? 'text-expense-dark'
+                            : 'text-[#534AB7]'
+                        }`}
+                      >
+                        {r.type === 'investment' ? '→ ' : r.type === 'income' ? '+ ' : '− '}
+                        {formatCurrency(Number(r.amount))}
+                      </span>
+                    </div>
+                  )
+                })}
+                {recurring.length > 5 && (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    <a href="/recurring" className="text-blue-600 hover:underline">
+                      Visualizza tutte le {recurring.length} ricorrenze
+                    </a>
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
