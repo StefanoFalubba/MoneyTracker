@@ -10,16 +10,28 @@ export interface Category {
   created_at: string
 }
 
+export interface Subcategory {
+  id: string
+  user_id: string
+  category_id: string
+  name: string
+  icon: string | null
+  color: string | null
+  created_at: string
+}
+
 export interface Transaction {
   id: string
   user_id: string
   category_id: string | null
+  subcategory_id: string | null
   amount: number
   type: TransactionType
   description: string | null
   date: string
   created_at: string
   category?: Category | null
+  subcategory?: Subcategory | null
 }
 
 export type Database = {
@@ -46,12 +58,34 @@ export type Database = {
           created_at?: string
         }
       }
+      subcategories: {
+        Row: Subcategory
+        Insert: {
+          id?: string
+          user_id: string
+          category_id: string
+          name: string
+          icon?: string | null
+          color?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          category_id?: string
+          name?: string
+          icon?: string | null
+          color?: string | null
+          created_at?: string
+        }
+      }
       transactions: {
-        Row: Omit<Transaction, 'category'>
+        Row: Omit<Transaction, 'category' | 'subcategory'>
         Insert: {
           id?: string
           user_id: string
           category_id?: string | null
+          subcategory_id?: string | null
           amount: number
           type: TransactionType
           description?: string | null
@@ -62,6 +96,7 @@ export type Database = {
           id?: string
           user_id?: string
           category_id?: string | null
+          subcategory_id?: string | null
           amount?: number
           type?: TransactionType
           description?: string | null

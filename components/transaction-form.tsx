@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import type { Transaction, Category, TransactionType } from '@/types/database'
+import type { Transaction, Category, Subcategory, TransactionType } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,6 +30,7 @@ const schema = z.object({
   amount: z.coerce.number().positive('Inserisci un importo valido'),
   description: z.string().optional(),
   category_id: z.string().optional(),
+  subcategory_id: z.string().optional(),
   date: z.string().min(1, 'Seleziona una data'),
 })
 
@@ -40,6 +41,7 @@ interface Props {
   onClose: () => void
   onSaved: () => void
   categories: Category[]
+  subcategories: Subcategory[]
   transaction?: Transaction | null
   userId: string
 }
@@ -50,11 +52,17 @@ const TYPE_TABS: { type: TransactionType; label: string; color: string; accent: 
   { type: 'investment', label: 'Investimento', color: 'text-[#534AB7]', accent: 'border-[#7F77DD] bg-investment-light' },
 ]
 
-export function TransactionForm({ open, onClose, onSaved, categories, transaction, userId }: Props) {
+export function TransactionForm({ open, onClose, onSaved, categories, subcategories, transaction, userId }: Props) {
   const [type, setType] = useState<TransactionType>(transaction?.type ?? 'expense')
   const [loading, setLoading] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    transaction?.category_id ?? undefined
+  )
 
   const filteredCats = categories.filter((c) => c.type === type)
+  const filteredSubs = selectedCategory
+    ? subcategories.filter((s) => s.category_id === selectedCategory)
+    : []
 
   const {
     register,
@@ -69,6 +77,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
       amount: transaction ? Number(transaction.amount) : undefined,
       description: transaction?.description ?? '',
       category_id: transaction?.category_id ?? undefined,
+      subcategory_id: transaction?.subcategory_id ?? undefined,
       date: transaction?.date ?? format(new Date(), 'yyyy-MM-dd'),
     },
   })
@@ -77,27 +86,33 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
     if (open) {
       if (transaction) {
         setType(transaction.type)
+        setSelectedCategory(transaction.category_id ?? undefined)
         reset({
           amount: Number(transaction.amount),
           description: transaction.description ?? '',
           category_id: transaction.category_id ?? undefined,
+          subcategory_id: transaction.subcategory_id ?? undefined,
           date: transaction.date,
         })
       } else {
         setType('expense')
+        setSelectedCategory(undefined)
         reset({
           amount: undefined,
           description: '',
           category_id: undefined,
+          subcategory_id: undefined,
           date: format(new Date(), 'yyyy-MM-dd'),
         })
       }
     }
   }, [open, transaction, reset])
 
-  // Reset category when type changes
+  // Reset category and subcategory when type changes
   useEffect(() => {
+    setSelectedCategory(undefined)
     setValue('category_id', undefined)
+    setValue('subcategory_id', undefined)
   }, [type, setValue])
 
   async function onSubmit(data: FormData) {
@@ -112,6 +127,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
             amount: data.amount,
             description: data.description || null,
             category_id: data.category_id || null,
+            subcategory_id: data.subcategory_id || null,
             date: data.date,
           })
           .eq('id', transaction.id)
@@ -121,6 +137,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
           amount: data.amount,
           description: data.description || null,
           category_id: data.category_id || null,
+          subcategory_id: data.subcategory_id || null,
           date: data.date,
         })
 
@@ -198,7 +215,12 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
             <Label>Categoria</Label>
             <Select
               value={watch('category_id') ?? ''}
-              onValueChange={(v) => setValue('category_id', v)}
+              onValueChange={(v) => {
+                setSelectedCategory(v)
+                setValue('category_id', v)
+                // Reset subcategory when category changes
+                setValue('subcategory_id', undefined)
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona categoria" />
@@ -212,6 +234,28 @@ export function TransactionForm({ open, onClose, onSaved, categories, transactio
               </SelectContent>
             </Select>
           </div>
+
+          {/* Subcategory selector - only for expenses with selected category and available subcategories */}
+          {type === 'expense' && selectedCategory && filteredSubs.length > 0 && (
+            <div className="space-y-2">
+              <Label>Sottocategoria</Label>
+              <Select
+                value={watch('subcategory_id') ?? ''}
+                onValueChange={(v) => setValue('subcategory_id', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleziona sottocategoria (opzionale)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredSubs.map((sub) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.icon} {sub.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="date">Data</Label>

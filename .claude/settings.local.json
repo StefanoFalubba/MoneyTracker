@@ -9,7 +9,9 @@
       "Bash(git commit -m 'fix: drop Database generic from supabase clients to unblock build *)",
       "Bash(git commit -m 'fix: explicit cookie callback types for strict TS *)",
       "Bash(git commit -m 'fix: bulletproof type annotations for production build *)",
-      "Bash(git commit -m 'fix: harden runtime against missing env vars and middleware crashes *)"
+      "Bash(git commit -m 'fix: harden runtime against missing env vars and middleware crashes *)",
+      "Bash(git commit -m 'fix: make migration idempotent with drop-if-exists guards *)",
+      "Bash(git commit -m 'feat: add one-time backfill migration for pre-existing users *)"
     ]
   }
 }

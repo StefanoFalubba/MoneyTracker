@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import type { Transaction, Category, TransactionType } from '@/types/database'
+import type { Transaction, Category, Subcategory, TransactionType } from '@/types/database'
 import { formatCurrency, formatDate, TYPE_CONFIG } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,15 +32,17 @@ import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 const PAGE_SIZE = 20
 
 interface Props {
-  initialTransactions: (Transaction & { category: Category | null })[]
+  initialTransactions: (Transaction & { category: Category | null; subcategory: Subcategory | null })[]
   categories: Category[]
+  subcategories: Subcategory[]
   userId: string
 }
 
-export function TransactionsClient({ initialTransactions, categories, userId }: Props) {
+export function TransactionsClient({ initialTransactions, categories, subcategories, userId }: Props) {
   const [transactions, setTransactions] = useState(initialTransactions)
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterSubcategory, setFilterSubcategory] = useState<string>('all')
   const [filterDateFrom, setFilterDateFrom] = useState('')
   const [filterDateTo, setFilterDateTo] = useState('')
   const [page, setPage] = useState(1)
@@ -52,11 +54,12 @@ export function TransactionsClient({ initialTransactions, categories, userId }: 
     return transactions.filter((t) => {
       if (filterType !== 'all' && t.type !== filterType) return false
       if (filterCategory !== 'all' && t.category_id !== filterCategory) return false
+      if (filterSubcategory !== 'all' && t.subcategory_id !== filterSubcategory) return false
       if (filterDateFrom && t.date < filterDateFrom) return false
       if (filterDateTo && t.date > filterDateTo) return false
       return true
     })
-  }, [transactions, filterType, filterCategory, filterDateFrom, filterDateTo])
+  }, [transactions, filterType, filterCategory, filterSubcategory, filterDateFrom, filterDateTo])
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -65,7 +68,7 @@ export function TransactionsClient({ initialTransactions, categories, userId }: 
     const supabase = createClient()
     const { data } = await supabase
       .from('transactions')
-      .select('*, category:categories(*)')
+      .select('*, category:categories(*), subcategory:subcategories(*)')
       .eq('user_id', userId)
       .order('date', { ascending: false })
     setTransactions(data ?? [])
@@ -110,7 +113,7 @@ export function TransactionsClient({ initialTransactions, categories, userId }: 
               </SelectContent>
             </Select>
 
-            <Select value={filterCategory} onValueChange={(v) => { setFilterCategory(v); setPage(1) }}>
+            <Select value={filterCategory} onValueChange={(v) => { setFilterCategory(v); setFilterSubcategory('all'); setPage(1) }}>
               <SelectTrigger>
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
@@ -123,6 +126,24 @@ export function TransactionsClient({ initialTransactions, categories, userId }: 
                 ))}
               </SelectContent>
             </Select>
+
+            {filterCategory !== 'all' && subcategories.filter(s => s.category_id === filterCategory).length > 0 && (
+              <Select value={filterSubcategory} onValueChange={(v) => { setFilterSubcategory(v); setPage(1) }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sottocategoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutte le sottocategorie</SelectItem>
+                  {subcategories
+                    .filter(s => s.category_id === filterCategory)
+                    .map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.icon} {s.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            )}
 
             <Input
               type="date"
@@ -178,6 +199,11 @@ export function TransactionsClient({ initialTransactions, categories, userId }: 
                       </Badge>
                       {t.category && (
                         <span className="text-xs text-muted-foreground">{t.category.name}</span>
+                      )}
+                      {t.subcategory && (
+                        <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                          {t.subcategory.icon} {t.subcategory.name}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -248,6 +274,7 @@ export function TransactionsClient({ initialTransactions, categories, userId }: 
         onClose={() => setFormOpen(false)}
         onSaved={reload}
         categories={categories}
+        subcategories={subcategories}
         transaction={editingTx}
         userId={userId}
       />

@@ -9,19 +9,21 @@ export default async function TransactionsPage() {
 
   if (!user) return null
 
-  const [{ data: transactions }, { data: categories }] = await Promise.all([
+  const [{ data: transactions }, { data: categories }, { data: subcategories }] = await Promise.all([
     supabase
       .from('transactions')
-      .select('*, category:categories(*)')
+      .select('*, category:categories(*), subcategory:subcategories(*)')
       .eq('user_id', user.id)
       .order('date', { ascending: false }),
     supabase.from('categories').select('*').eq('user_id', user.id),
+    supabase.from('subcategories').select('*').eq('user_id', user.id),
   ])
 
   return (
     <TransactionsClient
       initialTransactions={transactions ?? []}
       categories={categories ?? []}
+      subcategories={subcategories ?? []}
       userId={user.id}
     />
   )

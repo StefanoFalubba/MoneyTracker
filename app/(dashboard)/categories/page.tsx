@@ -9,11 +9,24 @@ export default async function CategoriesPage() {
 
   if (!user) return null
 
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('name')
+  const [{ data: categories }, { data: subcategories }] = await Promise.all([
+    supabase
+      .from('categories')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('name'),
+    supabase
+      .from('subcategories')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('name'),
+  ])
 
-  return <CategoriesClient initialCategories={categories ?? []} userId={user.id} />
+  return (
+    <CategoriesClient
+      initialCategories={categories ?? []}
+      initialSubcategories={subcategories ?? []}
+      userId={user.id}
+    />
+  )
 }
