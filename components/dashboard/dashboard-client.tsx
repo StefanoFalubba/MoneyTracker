@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { format, subMonths } from 'date-fns'
 import { it } from 'date-fns/locale'
 import {
@@ -22,6 +22,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Info } from 'lucide-react'
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
+import { QuickAddForm } from '@/components/quick-add/quick-add-form'
+import { QuickAddFAB } from '@/components/quick-add/quick-add-fab'
 
 interface Props {
   transactions: Transaction[]
@@ -31,6 +33,7 @@ interface Props {
   monthEnd: string
   sixMonthsAgo: string
   currentMonthLabel: string
+  userId: string
 }
 
 export function DashboardClient({
@@ -40,7 +43,9 @@ export function DashboardClient({
   monthStart,
   monthEnd,
   currentMonthLabel,
+  userId,
 }: Props) {
+  const [reloadTrigger, setReloadTrigger] = useState(0)
   // Monthly totals for the current month
   const monthlyTotals = useMemo(() => {
     const monthTxs = transactions.filter(
@@ -119,6 +124,22 @@ export function DashboardClient({
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground capitalize">{currentMonthLabel}</p>
         </div>
+
+        {/* Quick Add Form - Desktop Only */}
+        <div className="hidden md:block">
+          <QuickAddForm
+            categories={categories}
+            userId={userId}
+            onSuccess={() => setReloadTrigger(r => r + 1)}
+          />
+        </div>
+
+        {/* Quick Add FAB - Mobile Only */}
+        <QuickAddFAB
+          categories={categories}
+          userId={userId}
+          onSuccess={() => setReloadTrigger(r => r + 1)}
+        />
 
         {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

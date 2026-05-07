@@ -44,6 +44,7 @@ export default async function DashboardPage() {
       monthEnd={monthEnd}
       sixMonthsAgo={sixMonthsAgo}
       currentMonthLabel={format(now, 'MMMM yyyy')}
+      userId={user.id}
     />
   )
 }
