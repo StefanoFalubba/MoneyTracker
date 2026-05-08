@@ -6,6 +6,7 @@ import { TrendingUp, Menu, X, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -30,7 +31,7 @@ export function Navbar({ userEmail }: { userEmail: string }) {
   }
 
   return (
-    <nav className="bg-white border-b shadow-sm sticky top-0 z-40">
+    <nav className="bg-card border-b shadow-sm sticky top-0 z-40">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -64,26 +65,30 @@ export function Navbar({ userEmail }: { userEmail: string }) {
             <span className="text-sm text-muted-foreground truncate max-w-[180px]">
               {userEmail}
             </span>
+            <ThemeToggle />
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-1" />
               Esci
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-md"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          {/* Mobile: theme toggle + menu button */}
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              className="p-2 rounded-md"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t bg-white px-4 py-3 space-y-1">
+        <div className="md:hidden border-t bg-card px-4 py-3 space-y-1">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}

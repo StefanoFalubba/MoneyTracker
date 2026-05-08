@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
 import { PWARegister } from '@/components/pwa-register'
+import { ThemeProvider } from '@/components/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,9 +27,12 @@ export const metadata: Metadata = {
     viewportFit: 'cover',
   },
   icons: {
-    icon: '/icons/icon-192.svg',
-    shortcut: '/icons/icon-192.svg',
-    apple: '/icons/icon-192.svg',
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/icons/icon-192.png',
+    apple: '/icons/icon-192.png',
   },
   other: {
     'theme-color': '#22c55e',
@@ -47,11 +51,30 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="it">
+    <html lang="it" suppressHydrationWarning>
+      <head>
+        {/* No-flash script: set theme class before paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('financetrack-theme');
+                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var theme = stored || (prefersDark ? 'dark' : 'light');
+                  if (theme === 'dark') document.documentElement.classList.add('dark');
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
-        {children}
-        <Toaster richColors position="top-right" />
-        <PWARegister />
+        <ThemeProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+          <PWARegister />
+        </ThemeProvider>
       </body>
     </html>
   )

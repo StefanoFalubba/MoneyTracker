@@ -27,25 +27,25 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --background: 0 0% 4%;            /* Nero quasi puro */
+    --foreground: 0 0% 96%;            /* Bianco morbido */
+    --card: 0 0% 8%;                   /* Card grigio scuro */
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 64%;      /* Grigio chiaro per testo secondario */
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 96%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 0 0% 84%;
   }
 }
 
@@ -56,4 +56,96 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Dark mode adjustments for transaction colors */
+.dark .text-income-dark {
+  color: #4ade80 !important; /* Verde più brillante per dark mode */
+}
+.dark .text-expense-dark {
+  color: #f87171 !important; /* Rosso più brillante per dark mode */
+}
+.dark .text-\[\#534AB7\] {
+  color: #a5a0e8 !important; /* Viola più brillante per dark mode */
+}
+
+/* Background variants for dark mode (per le card colorate) */
+.dark .bg-income-light {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+.dark .bg-expense-light {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+.dark .bg-investment-light {
+  background-color: rgba(127, 119, 221, 0.15);
+}
+
+/* P.IVA badge background */
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+.dark .text-blue-900 {
+  color: #93c5fd !important;
+}
+.dark .border-blue-300 {
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Slate-50 backgrounds (used for personal toggle) */
+.dark .bg-slate-50 {
+  background-color: hsl(var(--card)) !important;
+}
+.dark .bg-slate-100 {
+  background-color: hsl(var(--muted)) !important;
+}
+.dark .text-slate-900 {
+  color: hsl(var(--foreground)) !important;
+}
+.dark .border-slate-400 {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Quick Add gradient cards */
+.dark .from-slate-50 {
+  --tw-gradient-from: hsl(var(--card)) !important;
+}
+.dark .to-white {
+  --tw-gradient-to: hsl(var(--card)) !important;
+}
+
+/* Toggle pills active state (Globale/Personale/P.IVA, etc.) */
+.dark .bg-white {
+  background-color: hsl(var(--card)) !important;
+}
+.dark .bg-white\/50 {
+  background-color: hsl(var(--muted) / 0.5) !important;
+}
+.dark .bg-white\/80 {
+  background-color: hsl(var(--muted) / 0.8) !important;
+}
+
+/* Yellow FAB & buttons - keep brand color but with subtle dark adjustments */
+.dark .bg-yellow-500 {
+  background-color: #eab308;
+}
+.dark .hover\:bg-yellow-600:hover {
+  background-color: #ca8a04;
+}
+
+/* Recharts text in dark mode */
+.dark .recharts-text,
+.dark .recharts-cartesian-axis-tick-value tspan {
+  fill: hsl(var(--muted-foreground)) !important;
+}
+.dark .recharts-cartesian-grid line {
+  stroke: hsl(var(--border)) !important;
+}
+.dark .recharts-default-tooltip {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+.dark .recharts-tooltip-label,
+.dark .recharts-tooltip-item {
+  color: hsl(var(--foreground)) !important;
 }
