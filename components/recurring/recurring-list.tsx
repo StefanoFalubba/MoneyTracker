@@ -212,7 +212,7 @@ export function RecurringList({ recurring, categories, onUpdate }: Props) {
                     <AlertDialogContent>
                       <AlertDialogTitle>Elimina ricorrenza?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Eliminerai "{r.name}" dalla lista. Le transazioni passate non verranno eliminate.
+                        Eliminerai &quot;{r.name}&quot; dalla lista. Le transazioni passate non verranno eliminate.
                       </AlertDialogDescription>
                       <div className="flex gap-2">
                         <AlertDialogCancel>Annulla</AlertDialogCancel>
