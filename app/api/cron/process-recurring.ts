@@ -7,6 +7,7 @@ interface RecurringTransaction {
   user_id: string
   category_id: string
   subcategory_id: string | null
+  name: string
   amount: number
   type: 'income' | 'expense' | 'investment'
   frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly'
