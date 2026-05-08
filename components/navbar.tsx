@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils'
 const NAV_LINKS = [
   { href: '/', label: 'Dashboard' },
   { href: '/transactions', label: 'Transazioni' },
+  { href: '/analytics', label: 'Analisi' },
+  { href: '/recurring', label: 'Ricorrenze' },
   { href: '/investments', label: 'Investimenti' },
   { href: '/categories', label: 'Categorie' },
   { href: '/import', label: 'Importa' },
