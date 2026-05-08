@@ -32,6 +32,7 @@ const schema = z.object({
   category_id: z.string().optional(),
   subcategory_id: z.string().optional(),
   date: z.string().min(1, 'Seleziona una data'),
+  is_business: z.boolean().default(false),
 })
 
 type FormData = z.infer<typeof schema>
@@ -79,6 +80,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, subcategor
       category_id: transaction?.category_id ?? undefined,
       subcategory_id: transaction?.subcategory_id ?? undefined,
       date: transaction?.date ?? format(new Date(), 'yyyy-MM-dd'),
+      is_business: transaction?.is_business ?? false,
     },
   })
 
@@ -93,6 +95,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, subcategor
           category_id: transaction.category_id ?? undefined,
           subcategory_id: transaction.subcategory_id ?? undefined,
           date: transaction.date,
+          is_business: transaction.is_business ?? false,
         })
       } else {
         setType('expense')
@@ -103,6 +106,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, subcategor
           category_id: undefined,
           subcategory_id: undefined,
           date: format(new Date(), 'yyyy-MM-dd'),
+          is_business: false,
         })
       }
     }
@@ -129,6 +133,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, subcategor
             category_id: data.category_id || null,
             subcategory_id: data.subcategory_id || null,
             date: data.date,
+            is_business: data.is_business,
           })
           .eq('id', transaction.id)
       : await supabase.from('transactions').insert({
@@ -139,6 +144,7 @@ export function TransactionForm({ open, onClose, onSaved, categories, subcategor
           category_id: data.category_id || null,
           subcategory_id: data.subcategory_id || null,
           date: data.date,
+          is_business: data.is_business,
         })
 
     setLoading(false)
@@ -263,6 +269,37 @@ export function TransactionForm({ open, onClose, onSaved, categories, subcategor
             {errors.date && (
               <p className="text-sm text-destructive">{errors.date.message}</p>
             )}
+          </div>
+
+          {/* P.IVA / Personale toggle */}
+          <div className="space-y-2">
+            <Label>Tipo conto</Label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setValue('is_business', false)}
+                className={cn(
+                  'flex-1 py-2 text-sm font-medium rounded-md border-2 transition-colors',
+                  !watch('is_business')
+                    ? 'border-slate-400 bg-slate-100 text-slate-900'
+                    : 'border-transparent bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                👤 Personale
+              </button>
+              <button
+                type="button"
+                onClick={() => setValue('is_business', true)}
+                className={cn(
+                  'flex-1 py-2 text-sm font-medium rounded-md border-2 transition-colors',
+                  watch('is_business')
+                    ? 'border-blue-500 bg-blue-50 text-blue-900'
+                    : 'border-transparent bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                💼 P.IVA
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-2 justify-end pt-2">

@@ -37,6 +37,8 @@ interface Props {
   userId: string
 }
 
+type AccountFilter = 'all' | 'personal' | 'business'
+
 export function DashboardClient({
   transactions,
   recentTransactions,
@@ -48,9 +50,18 @@ export function DashboardClient({
   userId,
 }: Props) {
   const [reloadTrigger, setReloadTrigger] = useState(0)
+  const [accountFilter, setAccountFilter] = useState<AccountFilter>('all')
+
+  // Apply account filter to all transactions
+  const filteredTransactions = useMemo(() => {
+    if (accountFilter === 'all') return transactions
+    if (accountFilter === 'business') return transactions.filter((t) => t.is_business)
+    return transactions.filter((t) => !t.is_business)
+  }, [transactions, accountFilter])
+
   // Monthly totals for the current month
   const monthlyTotals = useMemo(() => {
-    const monthTxs = transactions.filter(
+    const monthTxs = filteredTransactions.filter(
       (t) => t.date >= monthStart && t.date <= monthEnd
     )
     return {
@@ -58,7 +69,7 @@ export function DashboardClient({
       expense: monthTxs.filter((t) => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0),
       investment: monthTxs.filter((t) => t.type === 'investment').reduce((s, t) => s + Number(t.amount), 0),
     }
-  }, [transactions, monthStart, monthEnd])
+  }, [filteredTransactions, monthStart, monthEnd])
 
   const netBalance = monthlyTotals.income - monthlyTotals.expense
 
@@ -69,7 +80,7 @@ export function DashboardClient({
       const month = subMonths(now, 5 - i)
       const key = format(month, 'yyyy-MM')
       const label = format(month, 'MMM', { locale: it })
-      const monthTxs = transactions.filter((t) => t.date.startsWith(key))
+      const monthTxs = filteredTransactions.filter((t) => t.date.startsWith(key))
       return {
         month: label,
         Entrate: monthTxs.filter((t) => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0),
@@ -77,11 +88,11 @@ export function DashboardClient({
         Investimenti: monthTxs.filter((t) => t.type === 'investment').reduce((s, t) => s + Number(t.amount), 0),
       }
     })
-  }, [transactions])
+  }, [filteredTransactions])
 
   // Expense pie data for current month
   const expensePieData = useMemo(() => {
-    const monthTxs = transactions.filter(
+    const monthTxs = filteredTransactions.filter(
       (t) => t.date >= monthStart && t.date <= monthEnd && t.type === 'expense'
     )
     const byCat: Record<string, number> = {}
@@ -93,11 +104,11 @@ export function DashboardClient({
     return Object.entries(byCat)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
-  }, [transactions, categories, monthStart, monthEnd])
+  }, [filteredTransactions, categories, monthStart, monthEnd])
 
   // Investment donut data
   const investmentDonutData = useMemo(() => {
-    const monthTxs = transactions.filter(
+    const monthTxs = filteredTransactions.filter(
       (t) => t.date >= monthStart && t.date <= monthEnd && t.type === 'investment'
     )
     const byCat: Record<string, number> = {}
@@ -109,7 +120,7 @@ export function DashboardClient({
     return Object.entries(byCat)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
-  }, [transactions, categories, monthStart, monthEnd])
+  }, [filteredTransactions, categories, monthStart, monthEnd])
 
   const EXPENSE_COLORS = [
     '#ef4444', '#f97316', '#eab308', '#ec4899', '#f43f5e',
@@ -122,9 +133,28 @@ export function DashboardClient({
   return (
     <TooltipProvider>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground capitalize">{currentMonthLabel}</p>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground capitalize">{currentMonthLabel}</p>
+          </div>
+
+          {/* Account filter */}
+          <div className="flex gap-1 p-1 bg-muted rounded-md">
+            {(['all', 'personal', 'business'] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setAccountFilter(f)}
+                className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                  accountFilter === f
+                    ? 'bg-white text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {f === 'all' ? '🌐 Globale' : f === 'personal' ? '👤 Personale' : '💼 P.IVA'}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Quick Add Form - Desktop Only */}
@@ -430,6 +460,11 @@ export function DashboardClient({
                             <span className="text-xs text-muted-foreground hidden sm:inline">
                               {t.category.name}
                             </span>
+                          )}
+                          {t.is_business && (
+                            <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-900">
+                              💼 P.IVA
+                            </Badge>
                           )}
                         </div>
                       </div>

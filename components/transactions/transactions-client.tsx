@@ -43,6 +43,7 @@ export function TransactionsClient({ initialTransactions, categories, subcategor
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all')
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [filterSubcategory, setFilterSubcategory] = useState<string>('all')
+  const [filterAccount, setFilterAccount] = useState<'all' | 'personal' | 'business'>('all')
   const [filterDateFrom, setFilterDateFrom] = useState('')
   const [filterDateTo, setFilterDateTo] = useState('')
   const [page, setPage] = useState(1)
@@ -55,11 +56,13 @@ export function TransactionsClient({ initialTransactions, categories, subcategor
       if (filterType !== 'all' && t.type !== filterType) return false
       if (filterCategory !== 'all' && t.category_id !== filterCategory) return false
       if (filterSubcategory !== 'all' && t.subcategory_id !== filterSubcategory) return false
+      if (filterAccount === 'business' && !t.is_business) return false
+      if (filterAccount === 'personal' && t.is_business) return false
       if (filterDateFrom && t.date < filterDateFrom) return false
       if (filterDateTo && t.date > filterDateTo) return false
       return true
     })
-  }, [transactions, filterType, filterCategory, filterSubcategory, filterDateFrom, filterDateTo])
+  }, [transactions, filterType, filterCategory, filterSubcategory, filterAccount, filterDateFrom, filterDateTo])
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -95,6 +98,23 @@ export function TransactionsClient({ initialTransactions, categories, subcategor
           <Plus className="h-4 w-4 mr-2" />
           Nuova
         </Button>
+      </div>
+
+      {/* Account filter pills */}
+      <div className="flex gap-1 p-1 bg-muted rounded-md w-fit">
+        {(['all', 'personal', 'business'] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => { setFilterAccount(f); setPage(1) }}
+            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+              filterAccount === f
+                ? 'bg-white text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {f === 'all' ? '🌐 Globale' : f === 'personal' ? '👤 Personale' : '💼 P.IVA'}
+          </button>
+        ))}
       </div>
 
       {/* Filters */}
@@ -204,6 +224,11 @@ export function TransactionsClient({ initialTransactions, categories, subcategor
                         <span className="text-xs bg-muted px-2 py-0.5 rounded">
                           {t.subcategory.icon} {t.subcategory.name}
                         </span>
+                      )}
+                      {t.is_business && (
+                        <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-900">
+                          💼 P.IVA
+                        </Badge>
                       )}
                     </div>
                   </div>

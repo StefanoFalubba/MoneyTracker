@@ -38,6 +38,7 @@ interface Props {
 
 export function QuickAddForm({ categories, userId, onSuccess }: Props) {
   const [type, setType] = useState<'expense' | 'income'>('expense')
+  const [isBusiness, setIsBusiness] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const filteredCats = categories.filter((c) => c.type === type)
@@ -65,7 +66,7 @@ export function QuickAddForm({ categories, userId, onSuccess }: Props) {
       description: data.description || null,
       date: format(new Date(), 'yyyy-MM-dd'),
       subcategory_id: null,
-      is_business: false,
+      is_business: isBusiness,
     })
 
     setIsLoading(false)
@@ -118,6 +119,34 @@ export function QuickAddForm({ categories, userId, onSuccess }: Props) {
                 {typeConfig[t].label}
               </button>
             ))}
+          </div>
+
+          {/* P.IVA / Personale toggle */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setIsBusiness(false)}
+              className={cn(
+                'flex-1 py-1.5 text-xs font-medium rounded-md border transition-colors',
+                !isBusiness
+                  ? 'border-slate-400 bg-slate-100 text-slate-900'
+                  : 'border-transparent bg-muted text-muted-foreground'
+              )}
+            >
+              👤 Personale
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsBusiness(true)}
+              className={cn(
+                'flex-1 py-1.5 text-xs font-medium rounded-md border transition-colors',
+                isBusiness
+                  ? 'border-blue-500 bg-blue-50 text-blue-900'
+                  : 'border-transparent bg-muted text-muted-foreground'
+              )}
+            >
+              💼 P.IVA
+            </button>
           </div>
 
           {/* Amount */}
