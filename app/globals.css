@@ -91,18 +91,20 @@
   border-color: rgba(59, 130, 246, 0.4) !important;
 }
 
-/* Slate-50 backgrounds (used for personal toggle) */
+/* Slate-50 backgrounds (page-level surfaces) */
 .dark .bg-slate-50 {
   background-color: hsl(var(--card)) !important;
 }
+
+/* Personale toggle (selected state) — distinct slate tint, mirrors P.IVA blue */
 .dark .bg-slate-100 {
-  background-color: hsl(var(--muted)) !important;
+  background-color: rgba(148, 163, 184, 0.18) !important; /* slate-400 translucent */
 }
 .dark .text-slate-900 {
-  color: hsl(var(--foreground)) !important;
+  color: #e2e8f0 !important; /* slate-200 for readable contrast */
 }
 .dark .border-slate-400 {
-  border-color: hsl(var(--border)) !important;
+  border-color: rgba(148, 163, 184, 0.55) !important;
 }
 
 /* Quick Add gradient cards */
