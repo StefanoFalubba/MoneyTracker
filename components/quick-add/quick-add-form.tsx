@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { Zap } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 const schema = z.object({
   amount: z.coerce.number().positive('Importo deve essere positivo'),
@@ -90,7 +90,9 @@ export function QuickAddForm({ categories, userId, onSuccess }: Props) {
     <Card className="border-0 bg-gradient-to-br from-slate-50 to-white shadow-lg">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-yellow-500" />
+          <div className="flex items-center justify-center h-7 w-7 rounded-full bg-yellow-500 text-white">
+            <Plus className="h-5 w-5" strokeWidth={3} />
+          </div>
           <CardTitle className="text-base">Aggiungi veloce</CardTitle>
         </div>
       </CardHeader>
@@ -216,7 +218,14 @@ export function QuickAddForm({ categories, userId, onSuccess }: Props) {
                 : 'bg-income-dark hover:bg-income-dark/90'
             )}
           >
-            {isLoading ? 'Salvataggio...' : '✓ Aggiungi'}
+            {isLoading ? (
+              'Salvataggio...'
+            ) : (
+              <span className="flex items-center justify-center gap-1">
+                <Plus className="h-4 w-4" strokeWidth={3} />
+                Aggiungi
+              </span>
+            )}
           </Button>
         </form>
       </CardContent>

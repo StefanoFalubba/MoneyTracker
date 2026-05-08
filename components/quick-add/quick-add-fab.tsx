@@ -11,7 +11,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { QuickAddForm } from './quick-add-form'
-import { Zap } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 interface Props {
   categories: Category[]
@@ -27,10 +27,10 @@ export function QuickAddFAB({ categories, userId, onSuccess }: Props) {
       <SheetTrigger asChild>
         <Button
           size="lg"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl hover:shadow-2xl transition-all z-40 md:hidden bg-yellow-500 hover:bg-yellow-600 text-white animate-pulse"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl hover:shadow-2xl transition-all z-40 md:hidden bg-yellow-500 hover:bg-yellow-600 text-white"
           title="Aggiungi transazione velocemente"
         >
-          <Zap className="h-6 w-6" />
+          <Plus className="h-7 w-7" strokeWidth={3} />
         </Button>
       </SheetTrigger>
 
