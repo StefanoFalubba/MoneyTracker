@@ -59,6 +59,50 @@ function isTransfer(category: string): boolean {
   return TRANSFER_KEYWORDS.some((kw) => lower.includes(kw))
 }
 
+/**
+ * Auto-detects the CSV separator (`;` or `,`) by inspecting the header.
+ * Monefy can export with either depending on the locale.
+ */
+function detectSeparator(headerLine: string): ';' | ',' {
+  const semicolons = (headerLine.match(/;/g) ?? []).length
+  const commas = (headerLine.match(/,/g) ?? []).length
+  return semicolons >= commas ? ';' : ','
+}
+
+/**
+ * Parses a single CSV row honoring double-quoted fields (which may contain
+ * the separator). Supports escaped quotes ("") inside quoted fields.
+ */
+function parseCsvLine(line: string, sep: string): string[] {
+  const cols: string[] = []
+  let cur = ''
+  let inQuotes = false
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') {
+        cur += '"'
+        i++
+      } else if (ch === '"') {
+        inQuotes = false
+      } else {
+        cur += ch
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true
+      } else if (ch === sep) {
+        cols.push(cur)
+        cur = ''
+      } else {
+        cur += ch
+      }
+    }
+  }
+  cols.push(cur)
+  return cols
+}
+
 export function parseMonefyCSV(content: string): ParseResult {
   const valid: ParsedRow[] = []
   const skipped: { row: number; reason: string }[] = []
@@ -72,13 +116,15 @@ export function parseMonefyCSV(content: string): ParseResult {
     return { valid, skipped }
   }
 
+  // Auto-detect separator from header
+  const sep = detectSeparator(lines[0])
+
   // Skip header row (row index 0)
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i]
     const rowNum = i + 1 // 1-based for human display
 
-    // Split on semicolon
-    const cols = line.split(';')
+    const cols = parseCsvLine(line, sep)
 
     if (cols.length < 5) {
       skipped.push({ row: rowNum, reason: 'Formato riga non valido (meno di 5 colonne)' })

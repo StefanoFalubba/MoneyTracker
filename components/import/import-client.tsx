@@ -250,9 +250,13 @@ export function ImportClient({ categories, userId }: Props) {
             </div>
             <div className="mt-4 p-3 bg-muted rounded-md">
               <p className="text-xs text-muted-foreground font-medium mb-1">Formato atteso (Monefy):</p>
-              <code className="text-xs text-muted-foreground">
-                date;account;category;amount;currency;converted amount;currency;description
+              <code className="text-xs text-muted-foreground block break-all">
+                date,account,category,amount,currency,converted amount,currency,description
               </code>
+              <p className="text-xs text-muted-foreground mt-2">
+                Il separatore (<code>,</code> o <code>;</code>) viene rilevato automaticamente.
+                I trasferimenti tra conti vengono saltati.
+              </p>
             </div>
           </CardContent>
         </Card>
