@@ -34,10 +34,11 @@ interface Props {
   categories: Category[]
   userId: string
   onSuccess?: () => void
+  initialType?: 'expense' | 'income'
 }
 
-export function QuickAddForm({ categories, userId, onSuccess }: Props) {
-  const [type, setType] = useState<'expense' | 'income'>('expense')
+export function QuickAddForm({ categories, userId, onSuccess, initialType }: Props) {
+  const [type, setType] = useState<'expense' | 'income'>(initialType ?? 'expense')
   const [isBusiness, setIsBusiness] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 

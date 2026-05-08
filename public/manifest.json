@@ -52,24 +52,24 @@
   "shortcuts": [
     {
       "name": "Aggiungi spesa",
-      "short_name": "Aggiungi spesa",
+      "short_name": "+ Spesa",
       "description": "Aggiungi velocemente una nuova spesa",
-      "url": "/?add=expense",
-      "icons": [{ "src": "/icons/shortcut-expense.png", "sizes": "96x96" }]
+      "url": "/add?type=expense",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Aggiungi entrata",
-      "short_name": "Aggiungi entrata",
+      "short_name": "+ Entrata",
       "description": "Aggiungi velocemente una nuova entrata",
-      "url": "/?add=income",
-      "icons": [{ "src": "/icons/shortcut-income.png", "sizes": "96x96" }]
+      "url": "/add?type=income",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Transazioni",
       "short_name": "Transazioni",
       "description": "Visualizza tutte le transazioni",
       "url": "/transactions",
-      "icons": [{ "src": "/icons/shortcut-transactions.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "prefer_related_applications": false
