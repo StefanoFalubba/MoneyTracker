@@ -353,26 +353,11 @@ export function DashboardClient({
                   Nessuna spesa questo mese
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={expensePieData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                      labelLine={false}
-                    >
-                      {expensePieData.map((_, i) => (
-                        <Cell key={i} fill={EXPENSE_COLORS[i % EXPENSE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <CategoryBreakdown
+                  data={expensePieData}
+                  colors={EXPENSE_COLORS}
+                  donut={false}
+                />
               )}
             </CardContent>
           </Card>
@@ -388,27 +373,11 @@ export function DashboardClient({
                   Nessun investimento questo mese
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={investmentDonutData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                      labelLine={false}
-                    >
-                      {investmentDonutData.map((_, i) => (
-                        <Cell key={i} fill={INVESTMENT_COLORS[i % INVESTMENT_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <CategoryBreakdown
+                  data={investmentDonutData}
+                  colors={INVESTMENT_COLORS}
+                  donut={true}
+                />
               )}
             </CardContent>
           </Card>
@@ -489,5 +458,84 @@ export function DashboardClient({
         </Card>
       </div>
     </TooltipProvider>
+  )
+}
+
+/**
+ * Pie/donut chart with a custom legend on the side (or below on mobile).
+ * Avoids label clipping that the built-in Recharts labels suffer on small
+ * screens with many categories.
+ */
+function CategoryBreakdown({
+  data,
+  colors,
+  donut,
+}: {
+  data: { name: string; value: number }[]
+  colors: string[]
+  donut: boolean
+}) {
+  const total = data.reduce((s, d) => s + d.value, 0)
+  const top = data.slice(0, 8)
+  const restValue = data.slice(8).reduce((s, d) => s + d.value, 0)
+  const chartData = restValue > 0
+    ? [...top, { name: 'Altro', value: restValue }]
+    : top
+
+  return (
+    <div className="flex flex-col sm:flex-row gap-4 items-center">
+      {/* Chart */}
+      <div className="w-full sm:w-1/2 max-w-[240px] mx-auto">
+        <ResponsiveContainer width="100%" height={200}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={donut ? 50 : 0}
+              outerRadius={85}
+              dataKey="value"
+              paddingAngle={2}
+              stroke="hsl(var(--card))"
+              strokeWidth={2}
+            >
+              {chartData.map((_, i) => (
+                <Cell key={i} fill={colors[i % colors.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(v: number) => formatCurrency(v)}
+              contentStyle={{
+                background: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: 6,
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Custom legend */}
+      <div className="w-full sm:w-1/2 space-y-1.5 max-h-[220px] overflow-y-auto">
+        {chartData.map((d, i) => {
+          const pct = total > 0 ? (d.value / total) * 100 : 0
+          return (
+            <div key={i} className="flex items-center gap-2 text-xs">
+              <span
+                className="inline-block w-3 h-3 rounded-sm shrink-0"
+                style={{ backgroundColor: colors[i % colors.length] }}
+              />
+              <span className="flex-1 truncate" title={d.name}>{d.name}</span>
+              <span className="text-muted-foreground tabular-nums shrink-0">
+                {pct.toFixed(0)}%
+              </span>
+              <span className="font-medium tabular-nums shrink-0 w-16 text-right">
+                {formatCurrency(d.value)}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
