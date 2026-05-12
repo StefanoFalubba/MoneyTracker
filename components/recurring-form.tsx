@@ -86,7 +86,17 @@ export function RecurringForm({
           description: initialData.description || '',
           is_business: initialData.is_business,
         }
-      : undefined,
+      : {
+          name: '',
+          type: 'expense',
+          category_id: '',
+          subcategory_id: '',
+          frequency: 'monthly',
+          start_date: new Date().toISOString().split('T')[0],
+          end_date: '',
+          description: '',
+          is_business: false,
+        },
   })
 
   const selectedCategory = watch('category_id')
@@ -258,14 +268,14 @@ export function RecurringForm({
                 Sottocategoria (opzionale)
               </Label>
               <Select
-                value={watch('subcategory_id') ?? ''}
-                onValueChange={(v) => setValue('subcategory_id', v)}
+                value={watch('subcategory_id') || '__none__'}
+                onValueChange={(v) => setValue('subcategory_id', v === '__none__' ? '' : v)}
               >
                 <SelectTrigger id="subcategory">
                   <SelectValue placeholder="Seleziona sottocategoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nessuna</SelectItem>
+                  <SelectItem value="__none__">Nessuna</SelectItem>
                   {filteredSubcats.map((subcat) => (
                     <SelectItem key={subcat.id} value={subcat.id}>
                       {subcat.icon} {subcat.name}
